@@ -13,6 +13,7 @@ import com.aizuda.snailjob.common.log.SnailJobLog;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.AopProxyUtils;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -89,7 +90,9 @@ public class JobExecutorScanner implements Scanner, ApplicationContextAware {
                     Map<String, Method> mapExecutorMethodMap = new HashMap<>();
                     Method reduceExecutor = null;
                     Method mergeReduceExecutor = null;
-                    Method[] methods = bean.getClass().getMethods();
+                    // handle cglib
+                    Class<?> targetClass = AopUtils.getTargetClass(bean);
+                    Method[] methods = ReflectionUtils.getAllDeclaredMethods(targetClass);
                     for (final Method method1 : methods) {
                         Class<?>[] parameterTypes = method1.getParameterTypes();
                         MapExecutor mapExecutor = method1.getAnnotation(MapExecutor.class);
